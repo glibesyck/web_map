@@ -1,4 +1,11 @@
 import csv
+from geopy.geocoders import Nominatim
+from geopy.extra.rate_limiter import RateLimiter
+from geopy.exc import GeocoderUnavailable
+
+geolocator = Nominatim(user_agent='smth')
+geocode = RateLimiter(geolocator.geocode, min_delay_seconds=1)
+
 def reading_data(file:str) -> list:
     '''
     Return list of tuples (film, year, location) from file location.list.
@@ -17,16 +24,27 @@ def reading_data(file:str) -> list:
                     year = line[0].split('(')[1][:4]
                     if year.isdigit():
                         list_of_films.append((film, int(year), location))
-    return list_of_films
+    return list(set(list_of_films))
 
 def writing_csv_file (locations:list) :
     '''
-    Writes given information in CSV file (film, year, location).
+    Writes given information in CSV file (film, year, location, latitude, longitude).
     '''
-    with open('locations.csv', 'w') as locations_file :
+    start_idx = 10000 #there are a lot of data so I will go only with these films
+    end_idx = 15000
+    idx = 0
+    with open('locations1.csv', 'w') as locations_file :
         locations_writer = csv.writer(locations_file, delimiter=',')
         for line in locations :
-            locations_writer.writerow([line[0], line[1], line[2]])
+            idx += 1
+            if start_idx < idx and idx < end_idx :
+                try :
+                    location = geolocator.geocode(line[2])
+                    if location :
+                        locations_writer.writerow([line[0], line[1],\
+                        location.latitude, location.longitude])
+                except GeocoderUnavailable :
+                    pass
 
 
 
