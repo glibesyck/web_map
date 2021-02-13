@@ -1,3 +1,6 @@
+'''
+Module for transforming a data into comfortable file!
+'''
 import csv
 from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
@@ -37,7 +40,7 @@ def writing_csv_file (locations:list) :
         locations_writer = csv.writer(locations_file, delimiter=',')
         for line in locations :
             idx += 1
-            if start_idx < idx and idx < end_idx :
+            if start_idx < idx < end_idx :
                 try :
                     location = geolocator.geocode(line[2])
                     if location :
@@ -45,6 +48,3 @@ def writing_csv_file (locations:list) :
                         location.latitude, location.longitude])
                 except GeocoderUnavailable :
                     pass
-
-
-

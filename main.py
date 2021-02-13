@@ -1,3 +1,6 @@
+'''
+Main module!
+'''
 from map_generating import generating_map, ten_nearest, distance_films
 
 if __name__ == '__main__' :
