@@ -52,19 +52,20 @@ def generating_map(list_of_films:list, lat:float, lng:float, year:int) :
     '''
     Generates map with given properties.
     '''
-    map = folium.Map(location=[lat, lng], zoom_start=100)
+    map = folium.Map(location=[lat, lng], zoom_start=1000)
     fg = folium.FeatureGroup(name='Films')
     for film in list_of_films :
         fg.add_child(folium.Marker(location=[film[1], film[2]], 
         popup=film[0], icon=folium.Icon()))
     map.add_child(fg)
-    map.save('Map.html')
-
-
-
-
-
-    
-
-
+    fg_pp = folium.FeatureGroup(name="Population")
+    fg_pp.add_child(folium.GeoJson(data=open('world.json', 'r',
+    encoding='utf-8-sig').read(),
+    style_function=lambda x: {'fillColor':'green'
+    if x['properties']['POP2005'] < 10000000
+    else 'orange' if 10000000 <= x['properties']['POP2005'] < 20000000
+    else 'red'}))
+    map.add_child(fg_pp)
+    map.save('{}_map_films.html'.format(year))
+    return '{}_map_films.html'.format(year)
 
